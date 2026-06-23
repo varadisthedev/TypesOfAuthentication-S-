@@ -17,8 +17,8 @@ async function registerUser(req, res) {
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({ email, password: hashedPassword });
   await user.save();
-  // Create a JWT Token
-  const token = jwt.sign({ email: user.email, userId: user._id }, JWT_SECRET);
+  // Create a JWT Token — include role so authMiddleware can populate req.user.role
+  const token = jwt.sign({ email: user.email, userId: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
   // id is coming from mongo objecct id, which is unique for each user and can be used to identify the user in future requests.
 
   // Store the token in the cookie
@@ -43,7 +43,8 @@ async function loginUser(req, res) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
-  const token = jwt.sign({ email: user.email, userId: user._id }, JWT_SECRET, {
+  // Include role in payload — roleMiddleware reads it from req.user.role
+  const token = jwt.sign({ email: user.email, userId: user._id, role: user.role }, JWT_SECRET, {
     expiresIn: "1d",
   });
   res.cookie("authcookie", token, { maxAge: 900000, httpOnly: true });

@@ -23,8 +23,13 @@ app.use(
 // adding routes
 const userRoutes = require("./routes/userRoute");
 const adminRoutes = require("./routes/adminRoute");
-app.use(["/api", "/api/api"], userRoutes);
-app.use(["/api/admin", "/api/api/admin"], adminRoutes);
+const authMiddleware = require("./middleware/authMiddleware");
+const checkRole = require("./middleware/roleMiddleware");
+
+app.use("/api", userRoutes);
+// Admin routes: authMiddleware runs first (verifies JWT, sets req.user)
+// then checkRole verifies the role before reaching the actual route handlers
+app.use("/api/admin", authMiddleware, checkRole(["admin", "moderator"]), adminRoutes);
 
 // default route
 app.get("/", (req, res) => {
