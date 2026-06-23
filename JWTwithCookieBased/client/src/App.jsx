@@ -12,7 +12,14 @@ function App() {
 
   return (
     <>
-      <h1>this is teh dashboard</h1>
+      <h1>main page here</h1>
+
+      <nav>
+        <Link to="/">Home</Link> | <Link to="/login">Login</Link> |{" "}
+        <Link to="/profile">Profile</Link> |{" "}
+        <Link to="/dashboard">Dashboard</Link>
+      </nav>
+
       <Routes>
         <Route path="/" element={<h1>Home</h1>} />
         <Route path="/login" element={<Login />} />

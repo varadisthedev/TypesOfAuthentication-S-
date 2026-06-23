@@ -1,10 +1,10 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
 
-dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
+
+
 
 async function registerUser(req, res) {
   const { email, password } = req.body;
@@ -22,7 +22,7 @@ async function registerUser(req, res) {
   // id is coming from mongo objecct id, which is unique for each user and can be used to identify the user in future requests.
 
   // Store the token in the cookie
-  res.cookie("authcookie", token, { maxAge: 900000, httpOnly: true }); // 15 minutes http only prevent XSS attacks
+  res.cookie("authcookie", token, { maxAge: 1000 * 60 * 15, httpOnly: true }); // 15 minutes http only prevent XSS attacks
   // now authcookie stores jwt token
   res
     .status(201)
@@ -50,15 +50,6 @@ async function loginUser(req, res) {
   res.json({ message: "Login successful, token stored in cookie" });
 }
 
-async function getprofile(req, res) {
-  const userId = req.userId;
-  const user = await User.findById(userId).select("-password");
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-  res.json({ user });
-}
-
 async function logoutUser(req, res) {
   try {
     res.clearCookie("authcookie"); // Clear the authcookie
@@ -69,3 +60,23 @@ async function logoutUser(req, res) {
     res.status(500).json({ message: "Logout failed. Please try again." });
   }
 }
+
+async function getProfile(req, res) {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user profile" });
+  }
+}
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getProfile,
+  logoutUser,
+};

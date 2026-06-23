@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const chalk = require("chalk").default;
 const connectMongo = async () => {
   try {
     const mongoURI = process.env.MONGO_URI;
@@ -7,9 +7,9 @@ const connectMongo = async () => {
       throw new Error("MONGO_URI is not defined in the environment variables");
     }
     await mongoose.connect(mongoURI);
-    console.log("Connected to MongoDB");
+    console.log(chalk.green("✓ Connected to MongoDB"));
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+    console.error(chalk.red("✗ Error connecting to MongoDB:"), error);
     process.exit(1);
   }
 };

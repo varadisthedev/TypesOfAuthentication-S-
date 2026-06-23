@@ -8,6 +8,12 @@ const {
 } = require("../controllers/userControllers");
 const authMiddleware = require("../middleware/authMiddleware");
 
+// console.log(
+//   typeof registerUser,
+//   typeof loginUser,
+//   typeof getProfile,
+//   typeof logoutUser,
+// );
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/profile", authMiddleware, getProfile);

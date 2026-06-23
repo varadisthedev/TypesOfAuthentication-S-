@@ -39,10 +39,8 @@ export default function Login() {
         password: inputPassword,
       });
 
-      // Assuming the response contains a token
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+      // backend uses cookie
+      if (response.status === 200) {
         setIsLoggedIn(true);
         navigate("/dashboard"); // Redirect to dashboard after successful login
       }
