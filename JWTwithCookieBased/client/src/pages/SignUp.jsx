@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import authAPI from "../api/auth";
 import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function SignUp() {
   // navigate obj
   const navigate = useNavigate();
 
@@ -14,39 +14,41 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // NOTE: We cannot check for the auth cookie here because it is httpOnly.
-  // httpOnly cookies are invisible to JavaScript (document.cookie) by design —
-  // this is the security feature that prevents XSS attacks from stealing tokens.
-  // The server will reject requests with an invalid/missing cookie automatically.
+  // Check if user is already logged in
   useEffect(() => {
+    const token = document.cookie;
+    console.log(token)
+    if (token) {
+      setIsLoggedIn(true);
+      console.log("Token found, user is logged in. Redirecting to dashboard.");
+      navigate("/dashboard");
+    }
     setIsLoading(false);
-  }, []);
+  }, [navigate]);
 
-  // Handle login
-  const handleLogin = async (e) => {
+  // Handle signup
+  const handleSignup = async (e) => {
     e.preventDefault(); // prevent form submission default browser behavior
     if (!inputEmail || !inputPassword) {
       setError("Please fill in all fields");
       return;
     }
-    console.log("Logging in with:", inputEmail, inputPassword);
+    console.log("creating account with:", inputEmail, inputPassword);
     try {
-      const response = await authAPI.login({
+      const response = await authAPI.register({
         email: inputEmail,
         password: inputPassword,
       });
 
       // backend uses cookie
       if (response.status === 200) {
-        // No need to set isLoggedIn — the httpOnly cookie is already set on the
-        // server and will be sent with all subsequent requests.
-        // ProtectedRoute will handle auth checks automatically.
-        navigate("/dashboard"); // Redirect to dashboard after successful login
+        setIsLoggedIn(true);
+        navigate("/dashboard"); // Redirect to dashboard after successful signup
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("signup error:", error);
       setError(
-        error.response?.data?.message || "Login failed. Please try again.",
+        error.response?.data?.message || "signup failed. Please try again.",
       );
     } finally {
       setIsLoading(false);
@@ -54,9 +56,9 @@ export default function Login() {
   };
   return (
     <>
+    <h1>this is the signup page</h1>
       <div>
-        {isLoggedIn && <h1>Already logged in.</h1>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        <input type="name" placeholder="Name" onChange={(e) => setInputName(e.target.value)} />
         <input
           type="email"
           placeholder="Email"
@@ -67,7 +69,7 @@ export default function Login() {
           placeholder="Password"
           onChange={(e) => setInputPassword(e.target.value)}
         />
-        <button onClick={handleLogin}>Login</button>
+        <button onClick={handleSignup}>signup </button>
       </div>
     </>
   );

@@ -1,17 +1,27 @@
 // src/components/ProtectedRoute.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
+import authAPI from "../api/auth";
 
-// works like a middleware 
+// Verifies auth by pinging the server — the httpOnly cookie is sent
+// automatically by the browser, so we never need to read it in JS.
 export default function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("token");
-  // Checks for local storage token ,does not use cookie
+  const [isAuthed, setIsAuthed] = useState(null); // null = still checking
 
-  if (!token) {
-    // Redirect to login if not authenticated
-    console.log("No token found, redirecting to login.");
-    return <Navigate to="/login" replace />;
-  }
+  useEffect(() => {
+    authAPI
+      .getProfile()
+      .then(() => {
+        console.log("Cookie valid — user is authenticated.");
+        setIsAuthed(true);
+      })
+      .catch(() => {
+        console.log("No valid session — redirecting to login.");
+        setIsAuthed(false);
+      });
+  }, []);
 
+  if (isAuthed === null) return <p>Checking session...</p>; // loading
+  if (!isAuthed) return <Navigate to="/login" replace />;
   return children;
 }
