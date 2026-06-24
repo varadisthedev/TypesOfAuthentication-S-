@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 import authAPI from "../api/auth";
 import { useNavigate } from "react-router-dom";
 
+// components
+import { Input } from "../components/ui/Input.jsx";
+import { Button } from "../components/ui/Button.jsx";
+import { Card } from "../components/ui/Card.jsx";
+
 export default function SignUp() {
   // navigate obj
   const navigate = useNavigate();
@@ -13,11 +18,12 @@ export default function SignUp() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [inputName, setInputName] = useState("");
 
   // Check if user is already logged in
   useEffect(() => {
     const token = document.cookie;
-    console.log(token)
+    console.log(token);
     if (token) {
       setIsLoggedIn(true);
       console.log("Token found, user is logged in. Redirecting to dashboard.");
@@ -55,22 +61,33 @@ export default function SignUp() {
     }
   };
   return (
-    <>
-    <h1>this is the signup page</h1>
-      <div>
-        <input type="name" placeholder="Name" onChange={(e) => setInputName(e.target.value)} />
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setInputEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setInputPassword(e.target.value)}
-        />
-        <button onClick={handleSignup}>signup </button>
-      </div>
-    </>
+    <Card>
+      <h3>Sign Up</h3>
+      <Input
+        label="Name"
+        type="text"
+        placeholder="Name"
+        value={inputName}
+        onChange={(e) => setInputName(e.target.value)}
+        error={error && !inputName ? "Name is required" : ""}
+      />
+      <Input
+        label="Email"
+        type="email"
+        placeholder="Email"
+        value={inputEmail}
+        onChange={(e) => setInputEmail(e.target.value)}
+        error={error && !inputEmail ? "Email is required" : ""}
+      />
+      <Input
+        label="Password"
+        type="password"
+        placeholder="Password"
+        value={inputPassword}
+        onChange={(e) => setInputPassword(e.target.value)}
+        error={error && !inputPassword ? "Password is required" : ""}
+      />
+      <Button onClick={handleSignup}>signup </Button>
+    </Card>
   );
 }

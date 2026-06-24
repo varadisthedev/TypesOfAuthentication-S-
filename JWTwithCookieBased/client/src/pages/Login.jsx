@@ -4,12 +4,16 @@ import { useState, useEffect } from "react";
 import authAPI from "../api/auth";
 import { useNavigate } from "react-router-dom";
 
+import { Input } from "../components/ui/Input.jsx";
+import { Button } from "../components/ui/Button.jsx";
+import { Card } from "../components/ui/Card.jsx";
 export default function Login() {
   // navigate obj
   const navigate = useNavigate();
 
   const [inputEmail, setInputEmail] = useState("");
   const [inputPassword, setInputPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,6 +31,11 @@ export default function Login() {
     e.preventDefault(); // prevent form submission default browser behavior
     if (!inputEmail || !inputPassword) {
       setError("Please fill in all fields");
+      return;
+    }
+    // checking if both the password matches
+    if (inputPassword !== confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
     console.log("Logging in with:", inputEmail, inputPassword);
@@ -53,22 +62,41 @@ export default function Login() {
     }
   };
   return (
-    <>
-      <div>
-        {isLoggedIn && <h1>Already logged in.</h1>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setInputEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setInputPassword(e.target.value)}
-        />
-        <button onClick={handleLogin}>Login</button>
-      </div>
-    </>
+    <Card className="bg-slate-950  flex flex-col border-2 border-zinc-400 gap-2 m-4 items-center">
+      {isLoggedIn && <h1>Already logged in.</h1>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <Input
+        label="Email"
+        type="email"
+        placeholder="Email"
+        value={inputEmail}
+        onChange={(e) => setInputEmail(e.target.value)}
+        error={error && !inputEmail ? "Email is required" : ""}
+      />
+      <Input
+        label="Password"
+        type="password"
+        placeholder="Password"
+        value={inputPassword}
+        onChange={(e) => setInputPassword(e.target.value)}
+        error={error && !inputPassword ? "Password is required" : ""}
+      />
+
+      <Input
+        label="Confirm Password"
+        type="password"
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        error={
+          error && !confirmPassword
+            ? "Please confirm your password"
+            : "" || (error && inputPassword !== confirmPassword)
+              ? "Passwords do not match"
+              : ""
+        }
+      />
+      <Button onClick={handleLogin}>Login</Button>
+    </Card>
   );
 }
