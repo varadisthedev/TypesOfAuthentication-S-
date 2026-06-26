@@ -13,8 +13,11 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["user", "admin", "moderator"],
-    default: "user"
-  }
+    default: "user",
+  },
+  userCart: {
+    type: Array,
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
